@@ -39,7 +39,7 @@ const nav = {
     problem: '/problem',
     vfg: '/vfg',
     manual: 'https://planimation.github.io/documentation/ ',
-    demo: 'https://www.youtube.com/watch?v=Cj2rWdt1YQU',
+    demo: 'https://github.com/planimation/documentation/tree/master/AnimationProfiles',
     home: '/'
 };
 
@@ -47,7 +47,7 @@ function NavigationBar() {
     const [ url , setUrl ] = useState();
     const history = useHistory();
     const classes = useStyles();
-    
+
     const handleClick = (url) => {
         setUrl(url);
         if(url==='manual'){
@@ -75,10 +75,10 @@ function NavigationBar() {
           VFG
         </Link>
         <Link variant="button" color="inherit" className={classes.link}>
-          <a href={'https://planimation.github.io/documentation/'} target='_blank' rel="noreferrer" className={classes.alink}>User Manual</a>
+          <a href={nav.manual} target='_blank' rel="noreferrer" className={classes.alink}>User Manual</a>
         </Link>
-        <Link variant="button" color="inherit" onClick={()=>handleClick('demo')} className={classes.link}>
-        <a href={'https://www.youtube.com/watch?v=Cj2rWdt1YQU'} target='_blank' rel="noreferrer" className={classes.alink}>Demo</a>
+        <Link variant="button" color="inherit" className={classes.link}>
+        <a href={nav.demo} target='_blank' rel="noreferrer" className={classes.alink}>Demo</a>
         </Link>
       </nav>
       <Button color="inherit" variant="outlined"onClick={()=>handleClick('home')}  className={classes.link} >

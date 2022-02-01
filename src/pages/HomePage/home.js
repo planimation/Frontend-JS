@@ -102,7 +102,7 @@ export default function Home() {
         window.open('https://planimation.github.io/documentation/')
         break;
       case 4:
-        window.open('https://www.youtube.com/watch?v=Cj2rWdt1YQU')
+        window.open('https://github.com/planimation/documentation/tree/master/AnimationProfiles')
         break;
       default: return;
     }

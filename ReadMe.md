@@ -7,11 +7,11 @@ planimation is a modular and extensible open source framework to visualize seque
 [1.0 Project Overview](#1.0)
 
 [2.0 Deployment](#2.0)
-    
+
 [3.0 Development Environment](#3.0)
 
 [4.0 Using the system](#4.0)
- 
+
 [5.0 Architecture and Design](#5.0)
 
 [6.0 Change Log](#6.0)
@@ -26,7 +26,7 @@ Planimation is an openSource framework to visualise sequential solutions of plan
 
 The planimation goals are:
 
-* help to debug PDDL code for Online PDDL Editor users 
+* help to debug PDDL code for Online PDDL Editor users
 
 * increases user understanding of planning problems
 
@@ -52,7 +52,7 @@ The specific goals are:
 
 <h1 id="2.0"> 2.0 Deployment </h1>
 
-## Overview 
+## Overview
 
 Before building your development environment, you’ll need:
 A code editor
@@ -98,7 +98,7 @@ git clone https://github.com/visual-heuristics/frontend-js
 
 ```
 git config user.name "Mona Lisa"
- 
+
 git config user.email "email@example.com"
 ```
 ## Install frontend development environment:
@@ -116,7 +116,7 @@ npm run start
 ```
 This will open a page on your browser, and you should see a jumping rabbit like this:
 
- 
+
 
 Now, the development environment is all set up! Start coding😊
 
@@ -127,6 +127,13 @@ yarn test  //or “npm test” or testing in Jest
 ```
 Open the link in your browser, and you should see a visualisation of block world .
 
+### Deployment with Docker
+```
+docker build -t planimation_js .
+docker run -dp 8080:8080 planimation_js
+```
+Map TCP port 8080 in the container to port 8080 on the Docker host. Please make
+sure the docker port is same as the port number in nginx.conf.
 
 <h1 id="3.0"> 3.0 Development Environment</h1>
 
@@ -148,7 +155,7 @@ https://confluence.cis.unimelb.edu.au:8443/display/VH/Development+Environment+Se
 ## 4.1. Project Homepage:
 
 In coordinator homepage: Shows the four sections of the project.
-https://confluence.cis.unimelb.edu.au:8443/display/VH/Design+Notebook 
+https://confluence.cis.unimelb.edu.au:8443/display/VH/Design+Notebook
 
 ### 4.1.1 Go to PDDL file upload page
 
@@ -225,7 +232,7 @@ https://confluence.cis.unimelb.edu.au:8443/display/VH/Operational+Concept+Docume
 https://confluence.cis.unimelb.edu.au:8443/display/VH/Developer+Information+Frontend
 
 
-<h1 id="6.0"> 6.0 Change Log </h1> 
+<h1 id="6.0"> 6.0 Change Log </h1>
 
 
 ### 19/08/2021
