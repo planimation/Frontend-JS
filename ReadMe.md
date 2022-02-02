@@ -130,7 +130,7 @@ Open the link in your browser, and you should see a visualisation of block world
 ### Deployment with Docker
 ```
 docker build -t planimation_js .
-docker run -dp 8080:8080 planimation_js
+docker run --name planimation_js_frontend -dp 8080:8080 planimation_js
 ```
 Map TCP port 8080 in the container to port 8080 on the Docker host. Please make
 sure the docker port is same as the port number in nginx.conf.
