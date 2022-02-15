@@ -4,6 +4,7 @@ import PageOne from './pages/PageOne';
 import PageTwo from './pages/PageTwo';
 import PageThree from './pages/PageThree';
 import PageFour from './pages/PageFour';
+import PageFive from './pages/PageFive';
 import { withRouter, Route, Switch } from 'react-router-dom';
 import { ThemeProvider } from '@material-ui/styles';
 import { createTheme } from '@material-ui/core';
@@ -33,6 +34,7 @@ function App() {
         <Route path="/vfg" component={PageTwo} />
         <Route path="/page3" component={PageThree} />
         <Route path="/demo" component={PageFour} />
+        <Route path="/load" component={PageFive} />
       </Switch>
       </ThemeProvider>
     </div>

@@ -36,25 +36,29 @@ class PageFour extends React.Component {
         // in this class needs to bind like this:
         this.handleOnClick = this.handleOnClick.bind(this);
         this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
-        this.receiveMessageFromPlugin = this.receiveMessageFromPlugin.bind(this);
     }
 
     
 
     updateWindowDimensions() {
-        if(this.refDom){
-            const {clientWidth, clientHeight} = this.refDom;
-            const tmp_width = Math.max(clientWidth - 550, 720)
-            this.setState({ canvasWidth: tmp_width, canvasHeight: Math.min(tmp_width / 2, clientHeight - 120)  },(val)=>{
-                console.log('client.inner',clientWidth, clientHeight);
-            });
+            const clientWidth = window.document.clientWidth || window.innerWidth || window.document.body.clientWidth;
+            const clientHeight = window.document.clientHeight || window.innerHeight || window.document.body.clientHeight;
+            
+            // when the window is loaded at the backgroud, the clientwidth will be set to 0.
+            if (clientWidth !=0){
+                const tmp_width = Math.max(clientWidth - 550, 400);
+                this.setState({ canvasWidth: tmp_width, canvasHeight: Math.min(tmp_width / 2, clientHeight - 120)  },(val)=>{
+                    console.log('client.inner',clientWidth, clientHeight);
+                });
         }
+        
     }
 
 
 
     handleOnClick() {
-        this.props.history.push('/')
+        this.props.history.push('/');
+    
     }
 
 
@@ -75,37 +79,14 @@ class PageFour extends React.Component {
 
 
     componentDidMount() {
+        console.log("resize");
         this.updateWindowDimensions();
-        this.refDom.addEventListener('resize', this.updateWindowDimensions);
+        window.addEventListener('resize', this.updateWindowDimensions);
         
     }
 
 
 
-    receiveMessageFromPlugin ( event ) {
-        if(event.origin!== "http://localhost:3000"){
-            console.log( 'iframe is working:', event.origin );
-            let contentObject = {};
-
-            const content = localStorage.getItem('fileContent');
-            if(content) {
-                contentObject = JSON.parse(content);
-                allStages = getAllStages();
-                steps = getSteps();
-                stepInfo =  getStepInfo();
-                subGoal = getSubGoal();
-                stepSubgoalMap = getStepSubgoalMap();
-                vfg = contentObject;
-                textContent = content
-
-                this.stepItem = {};
-                steps.forEach((step, i) => {
-                    this.stepItem[i] = React.createRef();
-                })
-                this.setState({drawSprites: allStages[0]})
-            }
-        }
-    }
 
 
     /**
@@ -427,7 +408,7 @@ class PageFour extends React.Component {
         if(this.handlerPlay) {
             clearInterval(this.handlerPlay);
         }
-        this.refDom.removeEventListener('resize', this.updateWindowDimensions);
+        window.removeEventListener('resize', this.updateWindowDimensions);
         
     }
 
