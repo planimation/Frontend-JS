@@ -48,7 +48,7 @@ class PageFour extends React.Component {
             if (clientWidth !=0){
                 const tmp_width = Math.max(clientWidth - 550, 400);
                 this.setState({ canvasWidth: tmp_width, canvasHeight: Math.min(tmp_width / 2, clientHeight - 120)  },(val)=>{
-                    console.log('client.inner',clientWidth, clientHeight);
+                    // console.log('client.inner',clientWidth, clientHeight);
                 });
         }
         
@@ -79,7 +79,7 @@ class PageFour extends React.Component {
 
 
     componentDidMount() {
-        console.log("resize");
+     
         this.updateWindowDimensions();
         window.addEventListener('resize', this.updateWindowDimensions);
         

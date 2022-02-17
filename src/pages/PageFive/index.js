@@ -10,7 +10,6 @@ class PageFive extends React.Component {
     }
     componentDidMount() {
         localStorage.removeItem('fileContent');
-        console.log("cleaned");
          window.addEventListener('message', this.receiveMessageFromPlugin);
          window.parent.postMessage({"action":"loadfile"}, "*"); 
     }
@@ -47,7 +46,7 @@ class PageFive extends React.Component {
               
             } finally {
             }
-            console.log( 'iframe is working:', event.origin );
+     
           }
     }
 

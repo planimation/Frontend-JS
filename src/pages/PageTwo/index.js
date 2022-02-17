@@ -99,7 +99,7 @@ class PageTwo extends React.Component {
     reader.onload = function fileReadCompleted() {
         // reader.result
         let content = reader.result || '';
-        console.log("Content of file: ", content);
+      
         // Save content for page four
         localStorage.setItem('fileContent', content);
     };
@@ -111,7 +111,7 @@ class PageTwo extends React.Component {
   }
 
   handleFileChange(files) {
-    console.info("files: ", files);
+   
     const fileHandler = files[0];
 
     if(fileHandler) {
@@ -120,7 +120,7 @@ class PageTwo extends React.Component {
   }
 
   handleContinue() {
-    console.log(this.state.files.length);
+   
     if(this.state.files.length > 0){
       window.location.href = '/demo';
     } else {

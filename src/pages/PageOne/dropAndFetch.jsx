@@ -56,7 +56,7 @@ export default function DropAndFetch({ onStore, onClick, newURL }) {
       const txt = JSON.stringify(data);
       onStore(txt);
     } catch (error) {
-      console.log(error);
+   
       setAlert(error);
     } finally {
       setLoading(false);
@@ -79,7 +79,7 @@ export default function DropAndFetch({ onStore, onClick, newURL }) {
     ) {
       uploadPDDL(dataFiles);
     } else {
-      console.log("Some files are missing");
+      
       setAlert("Some files are missing");
     }
   };
