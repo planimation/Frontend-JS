@@ -2,7 +2,7 @@
 
 ## Demo
 
-https://morning-ridge-78538.herokuapp.com/
+https://planimation.planning.domains/
 
 ## Docker Build
 - Under the root folder
