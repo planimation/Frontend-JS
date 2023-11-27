@@ -3,8 +3,49 @@ import {subGoal, stepInfo, allStages, steps, stepSubgoalMap, vfg, textContent,
         getAllStages, getSteps, getStepInfo, getSubGoal, getStepSubgoalMap} from './dataUtils';
 import Button from '@material-ui/core/Button';
 import styles from './index.less';
-import Screen, { ControlPanel, StepScreen, GoalScreen } from "./screenComponents";
+import Screen, { ControlPanel, StepScreen, GoalScreen, SplitButton } from "./screenComponents";
 
+
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import TextField from '@mui/material/TextField';
+import DialogActions from '@mui/material/DialogActions';
+
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+
+import {
+    FormControl,
+    RadioGroup,
+    FormControlLabel,
+    Radio
+} from '@material-ui/core';
+
+import CircularProgress from "@material-ui/core/CircularProgress";
+
+import Select from '@mui/material/Select';
+
+import { InputLabel } from '@material-ui/core';
+
+class mediaDataLabel {
+
+    constructor(fileType = 'vfg', startStep = 0, stopStep = 1, quality = "high") {
+        this.fileType = fileType;
+        this.startStep = startStep;
+        this.stopStep = stopStep;
+        this.quality = quality;
+    }
+    bodyContent() {
+        const bodyContent = {
+            'fileType': this.fileType,
+            'startStep': this.startStep,
+            'stopStep': this.stopStep,
+            'quality': this.quality
+        }
+        return bodyContent;
+    }
+}
 
 class PageFour extends React.Component {
 
@@ -30,12 +71,21 @@ class PageFour extends React.Component {
             pauseButtonColor: 'default',
             canvasWidth: 720,
             canvasHeight: 470,
+            radioOption: 'all', 
+            currentDialogType: null,
+            isLoading: false,
+            qualityOption: 'medium',
         }
 
         // Every function that interfaces with UI and data used
         // in this class needs to bind like this:
         this.handleOnClick = this.handleOnClick.bind(this);
         this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
+        this.handleMenuOpen = this.handleMenuOpen.bind(this);
+        this.handleMenuClose = this.handleMenuClose.bind(this);
+        this.handleOpenDialog = this.handleOpenDialog.bind(this);
+        this.handleCloseDialog = this.handleCloseDialog.bind(this);
+        this.handleNumberChange = this.handleNumberChange.bind(this);
     }
 
     
@@ -393,12 +443,86 @@ class PageFour extends React.Component {
     }
 
 
+    async sendMediaRequestAndDownload(fileType, startStep, stopStep, qualityOption) {
+        try {
+          const vfgText = JSON.stringify(vfg);
+          //console.log(vfgText);
+          var label = new mediaDataLabel();
+          // assign any parameters here. otherwise, default will be used.
+          label.fileType = fileType;
+          switch (fileType){
+            case "mp4":
+                label.startStep = startStep;
+                label.stopStep = stopStep;
+                label.quality = qualityOption;
+                break;
+            case "png":
+                label.startStep = startStep;
+                label.stopStep = stopStep;
+                break;
+            case "gif":
+                label.startStep = startStep;
+                label.stopStep = stopStep;
+                label.quality = qualityOption;
+                break;
+          }
+
+          const requestData = {
+            method: 'POST',
+            body: JSON.stringify({
+              'vfg': vfgText,
+              'fileType': fileType,
+              'params': label.bodyContent()
+            })
+          };
+    
+          // For local testing, uncomment the next line and comment the following line.
+          //const response = await fetch("http://localhost:8000/downloadVisualisation", requestData);
+          const response = await fetch("https://planimation.planning.domains/downloadVisualisation", requestData);
+
+          if (response.ok) {
+            console.log("Response was OK");
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            if (fileType == "png"){
+                fileType = "zip";
+            }
+            a.download = 'planimation.'+fileType;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+          } else {
+            console.error("Failed to download the file.");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+        }
+      }
+
+      
+      // this function is for testing @Wenxuan
+      async handleMediaButtonClick(fileType) {
+          try {
+    
+            this.sendMediaRequestAndDownload(fileType);
+            
+          } catch(err) {
+              console.error("There was an error: ", err);
+          }
+ 
+    
+    }
+
 
     handleSpeedControllor = (value) => {
         this.setState({
             playSpeed: value
-        })
-    }
+        });
+    };
 
     
     /**
@@ -413,52 +537,191 @@ class PageFour extends React.Component {
     }
 
 
+    handleMenuOpen = (event) => {
+        this.setState({ anchorEl: event.currentTarget });
+    };
+
+    handleMenuClose = () => {
+        this.setState({ anchorEl: null });
+    };
+
+    handleOpenDialog = (type) => {
+        this.setState({ 
+            isModalOpen: true,
+            currentDialogType: type
+        });
+    }
+    
+    
+    handleCloseDialog = () => {
+        this.setState({ isModalOpen: false });
+    }
+    
+    handleNumberChange = (e, numberIndex) => {
+        this.setState({ [numberIndex]: e.target.value });
+    }
+
+    handleRadioChange = (event) => {
+        this.setState({
+            radioOption: event.target.value
+        });
+    }
+
+
+    handleDownload = async () => {
+        this.setState({ isloading: true });
+        if (this.state.radioOption === 'all') {
+            await this.sendMediaRequestAndDownload(this.state.currentDialogType, 0, 9999, this.state.qualityOption);
+        } else {
+            const { number1, number2 } = this.state;
+            await this.sendMediaRequestAndDownload(this.state.currentDialogType, number1, number2, this.state.qualityOption);
+        }
+        this.handleCloseDialog();
+        setTimeout(() => {
+            this.setState({ isloading: false });
+        }, 2000);
+    }
+
+    handleQualityChange = (event) => {
+        this.setState({ qualityOption: event.target.value });
+    };
+    
+
+
 
     render() {
         // Get all sprites
         let sprites = this.state.drawSprites;
         // Sort sprites by their depth
-         sprites && sprites.sort((itemA, itemB) => itemA.depth - itemB.depth)
+        sprites && sprites.sort((itemA, itemB) => itemA.depth - itemB.depth);
     
         return (
-            <div className={styles.container} ref={(ref)=>this.refDom=ref}>
+            <div className={styles.container} ref={(ref) => this.refDom = ref}>
                 <div className={styles.left}>
-                    <StepScreen stepInfoIndex={this.state.stepInfoIndex} stepItem={this.stepItem} stepInfo={stepInfo} onStepClick={this.handleStepsClick}/>
+                    <StepScreen stepInfoIndex={this.state.stepInfoIndex} stepItem={this.stepItem} stepInfo={stepInfo} onStepClick={this.handleStepsClick} />
                 </div>
                 <div className={styles.middle}>
-                    <Screen canvasWidth={this.state.canvasWidth} canvasHeight={this.state.canvasHeight}  sprites={this.state.drawSprites} vfg={vfg} />
+                    <Screen canvasWidth={this.state.canvasWidth} canvasHeight={this.state.canvasHeight} sprites={this.state.drawSprites} vfg={vfg} />
                     <div className={styles.btn_box}>
                         <div>
-                            <ControlPanel 
-                            playButtonColor={this.state.playButtonColor} 
-                            pauseButtonColor={this.state.pauseButtonColor}
-                            stepInfoIndex={this.state.stepInfoIndex}
-                            onPreviousClick={this.handlePreviousClick}
-                            onStartClick={this.handleStartClick}
-                            onPauseClick={this.handlePauseClick}
-                            onNextClick={this.handleNextClick}
-                            onResetClick={this.handleResetClick}
-                            onSpeedControllor={this.handleSpeedControllor}></ControlPanel>
+                            <ControlPanel
+                                playButtonColor={this.state.playButtonColor}
+                                pauseButtonColor={this.state.pauseButtonColor}
+                                stepInfoIndex={this.state.stepInfoIndex}
+                                onPreviousClick={this.handlePreviousClick}
+                                onStartClick={this.handleStartClick}
+                                onPauseClick={this.handlePauseClick}
+                                onNextClick={this.handleNextClick}
+                                onResetClick={this.handleResetClick}
+                                onSpeedControllor={this.handleSpeedControllor}>
+                            </ControlPanel>
                         </div>
                     </div>
                 </div>
-                
+    
                 <div className={styles.right}>
-                    <div style={{marginTop:'5px', marginBottom:'5px', width: '220px'}}>
-                        <Button variant="contained" color="primary" size="small" onClick={()=> {this.handleShowFinalGoalClick()}}>
+                    <div style={{ marginTop: '5px', marginBottom: '5px', width: '220px' }}>
+                        <Button variant="contained" color="primary" size="small" onClick={() => { this.handleShowFinalGoalClick() }}>
                             Show the Goal
                         </Button>
                         &nbsp;&nbsp;
-                        <Button variant="contained" color="primary" size="small" onClick={()=> {this.handleExportClick()}}>
+                        <Button variant="contained" color="primary" size="small" onClick={this.handleMenuOpen}>
                             Export
                         </Button>
+                        {this.state.isloading && <CircularProgress size={24} />}
+                        <Menu
+                            anchorEl={this.state.anchorEl}
+                            open={Boolean(this.state.anchorEl)}
+                            onClose={this.handleMenuClose}
+                        >
+                            <MenuItem onClick={() => { this.handleExportClick(); this.handleMenuClose(); }}>
+                                Export .vfg
+                            </MenuItem>
+                            <MenuItem onClick={() => { this.handleOpenDialog("png"); this.handleMenuClose(); }}>
+                                Export .png
+                            </MenuItem>
+                            <MenuItem onClick={() => { this.handleOpenDialog("gif"); this.handleMenuClose(); }}>
+                                Export .gif
+                            </MenuItem>
+                            <MenuItem onClick={() => { this.handleOpenDialog("mp4"); this.handleMenuClose(); }}>
+                                Export .mp4
+                            </MenuItem>
+                        </Menu>
+                        <Dialog open={this.state.isModalOpen} onClose={this.handleCloseDialog}>
+                            <DialogTitle>Download as {this.state.currentDialogType}</DialogTitle>
+                            <DialogContent>
+                                <FormControl component="fieldset">
+                                    <RadioGroup
+                                        value={this.state.radioOption}
+                                        onChange={this.handleRadioChange}
+                                    >
+                                        <FormControlLabel
+                                            value="all"
+                                            control={<Radio />}
+                                            label="Download All"
+                                        />
+                                        <FormControlLabel
+                                            value="range"
+                                            control={<Radio />}
+                                            label="Specify range"
+                                        />
+                                    </RadioGroup>
+                                </FormControl>
+                                {/* No need for quality option for PNGs */}
+                               
+    
+                                {this.state.radioOption === 'range' && (
+                                    <>
+                                        <div><small>Please enter a step range within 0 and {Number(steps.length) - 1}.</small></div>
+                                        <TextField
+                                            autoFocus
+                                            margin="dense"
+                                            id="number1"
+                                            label="start"
+                                            type="number"
+                                            fullWidth
+                                            value={this.state.number1}
+                                            onChange={(e) => this.handleNumberChange(e, 'number1')}
+                                        />
+                                        <TextField
+                                            margin="dense"
+                                            id="number2"
+                                            label="end"
+                                            type="number"
+                                            fullWidth
+                                            value={this.state.number2}
+                                            onChange={(e) => this.handleNumberChange(e, 'number2')}
+                                        />
+                                    </>
+                                )}
+                                 {this.state.currentDialogType !== "png" && (
+                                    <>
+                                        <FormControl fullWidth>
+                                            <InputLabel id="quality-label">Quality</InputLabel>
+                                            <Select
+                                                labelId="quality-label"
+                                                value={this.state.qualityOption}
+                                                onChange={this.handleQualityChange}
+                                            >
+                                                <MenuItem value="low">Low</MenuItem>
+                                                <MenuItem value="medium">Medium</MenuItem>
+                                                <MenuItem value="high">High</MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                    </>
+                                )}
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={this.handleCloseDialog} color="primary">Cancel</Button>
+                                <Button onClick={this.handleDownload} color="primary">Confirm</Button>
+                            </DialogActions>
+                        </Dialog>
                     </div>
                     <GoalScreen sprites={sprites} subGoal={subGoal} selectedSubGoals={this.state.selectedSubGoals}
-                      showKey={this.state.showKey} onSubItemClick={this.handleSubItemClick} onSubgoalStepItemClick={this.handleSubgoalStepItemClick}/>
+                        showKey={this.state.showKey} onSubItemClick={this.handleSubItemClick} onSubgoalStepItemClick={this.handleSubgoalStepItemClick} />
                 </div>
             </div>
-    );
+        );
     }
-}
-
+}    
 export default PageFour;
