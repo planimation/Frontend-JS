@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { Stage, Text, Sprite } from "@inlet/react-pixi";
 import { utils } from "pixi.js";
 import IconButton from "@material-ui/core/IconButton";
@@ -30,6 +30,7 @@ function valuetext(value) {
  * @returns Main visualisation screen with all sprites
  */
 export default function Screen({ canvasWidth, canvasHeight, sprites, vfg }) {
+
   return (
     <React.Fragment>
       <Stage
@@ -56,6 +57,11 @@ export default function Screen({ canvasWidth, canvasHeight, sprites, vfg }) {
               ((sprite.maxX - sprite.minX) * canvasHeight) / 2;
             y = canvasHeight - sprite.minY * canvasHeight;
           }
+          const spriteWidth = (sprite.maxX - sprite.minX) * canvasHeight;
+          const spriteHeight = (sprite.maxY - sprite.minY) * canvasHeight;
+          const centerY = y + spriteHeight / 2;
+
+
           // Draw the sprite with a text
           return (
             <React.Fragment key={i}>
@@ -65,7 +71,7 @@ export default function Screen({ canvasWidth, canvasHeight, sprites, vfg }) {
                   "data:image/png;base64," +
                   vfg.imageTable.m_values[
                     vfg.imageTable.m_keys.indexOf(sprite.prefabimage)
-                  ]
+                    ]
                 }
                 name={sprite.name}
                 anchor={anchor}
@@ -77,22 +83,40 @@ export default function Screen({ canvasWidth, canvasHeight, sprites, vfg }) {
                 tint={
                   "color" in sprite
                     ? utils.rgb2hex([
-                        sprite.color.r,
-                        sprite.color.g,
-                        sprite.color.b,
-                      ])
+                      sprite.color.r,
+                      sprite.color.g,
+                      sprite.color.b,
+                    ])
                     : null
                 }
                 alpha={sprite.color.a}
               />
-              <Text
-                // text on the sprite
-                text={sprite.showname ? sprite.name : ""}
-                style={{ fontFamily: "Arial", fontSize: 16, fill: 0x000000 }}
-                anchor={(0.5, 0.5)}
-                x={x + ((sprite.maxX - sprite.minX) * canvasHeight) / 2}
-                y={y + ((sprite.maxY - sprite.minY) * canvasHeight) / 2}
-              />
+              {sprite.showlabel ? (
+                <>
+                  <Text
+                    text={sprite.label}
+                    style={{ fontFamily: "Arial", fontSize: 16, fill: 0xe65c00 }}
+                    anchor={(0.5, 0.5)}
+                    x={x + spriteWidth / 2}
+                    y={centerY}  // Label in the middle
+                  />
+                  <Text
+                    text={sprite.showname ? sprite.name : ""}
+                    style={{ fontFamily: "Arial", fontSize: 16, fill: 0x000000 }}
+                    anchor={(0.5, 0.5)}
+                    x={x + spriteWidth / 2}
+                    y={y - 10}  // Name above the sprite
+                  />
+                </>
+              ) : (
+                <Text
+                  text={sprite.showname ? sprite.name : ""}
+                  style={{ fontFamily: "Arial", fontSize: 16, fill: 0x000000 }}
+                  anchor={(0.5, 0.5)}
+                  x={x + spriteWidth / 2}
+                  y={centerY}  // Name in the middle if no label
+                />
+              )}
             </React.Fragment>
           );
         })}
@@ -116,16 +140,16 @@ export default function Screen({ canvasWidth, canvasHeight, sprites, vfg }) {
  * @returns Control panel
  */
 export function ControlPanel({
-  playButtonColor,
-  pauseButtonColor,
-  stepInfoIndex,
-  onPreviousClick,
-  onStartClick,
-  onPauseClick,
-  onNextClick,
-  onResetClick,
-  onSpeedControllor,
-}) {
+                               playButtonColor,
+                               pauseButtonColor,
+                               stepInfoIndex,
+                               onPreviousClick,
+                               onStartClick,
+                               onPauseClick,
+                               onNextClick,
+                               onResetClick,
+                               onSpeedControllor,
+                             }) {
   return (
     <React.Fragment>
       <IconButton
@@ -242,16 +266,18 @@ export function StepScreen({ stepInfoIndex, stepItem, stepInfo, onStepClick }) {
  * @returns
  */
 export function GoalScreen({
-  sprites,
-  subGoal,
-  selectedSubGoals,
-  showKey,
-  onSubItemClick,
-  onSubgoalStepItemClick,
-}) {
+                             sprites,
+                             subGoal,
+                             selectedSubGoals,
+                             showKey,
+                             onSubItemClick,
+                             onSubgoalStepItemClick,
+                             visualStage
+                           }) {
+
   return (
     <React.Fragment>
-      <div className={styles.sub_title} style={{ position: "relative" }}>
+      <div className={styles.sub_title} style={{position: "relative"}}>
         <span className={styles.sub_title_key}>Subgoal</span>
         <span className={styles.sub_title_selected}>
           {Object.keys(selectedSubGoals || {}).length}/{subGoal.size}
@@ -275,7 +301,7 @@ export function GoalScreen({
                 {key}
                 <div
                   className={styles.sub_item_menu}
-                  style={{ display: showKey === key ? "block" : "none" }}
+                  style={{display: showKey === key ? "block" : "none"}}
                 >
                   {subGoal.get(key).map((value) => {
                     return (
@@ -293,6 +319,19 @@ export function GoalScreen({
             );
           })}
       </div>
+      <div className={styles.sub_title}>Action Cost</div>
+      {visualStage["cost"] ? (
+        <div key={visualStage["cost"]}
+             className={`${styles.action_cost} ${styles.action_cost_animation}`}>
+          {
+            Number(visualStage["cost"].toFixed(3)).toString()
+          }
+        </div>
+      ) : (
+        <div className={styles.action_cost}>No Cost</div>
+      )}
+
+
     </React.Fragment>
   );
 }
