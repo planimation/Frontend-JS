@@ -41,7 +41,7 @@ export function getSubGoal() {
                 }
             }
             map.set(currentStep, vidualSteps)
-         }
+        }
     })
     return map;
 }
@@ -78,5 +78,22 @@ export const subGoal = getSubGoal();
 export const stepSubgoalMap = getStepSubgoalMap();
 export const vfg = contentObject;
 export const textContent = content
+
+const visualStages = contentObject["visualStages"]?contentObject["visualStages"]: []
+
+export const stepCosts = Array.from(
+  new Set(
+    visualStages.map((item,index, arr)=>{
+        if (index === 0) {
+            return 0;
+        } else {
+            return (item.cost - arr[index - 1].cost)? (item.cost - arr[index - 1].cost):0 ;
+        }
+    })
+  )
+)
+
+export const maxStepCost = [...stepCosts].sort((a, b) => a - b)[stepCosts.length - 1];
+
 //export const initialPos = getInitialBlocksPos();
 //export default null;
