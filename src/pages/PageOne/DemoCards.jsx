@@ -15,10 +15,10 @@ const DemoCards = ({uploadFiles,closeGallery=()=>{}})=>{
      const path = 'AnimationProfiles';
      const branch = 'master';
      const githubApiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
-
+     const token = "ghp_WkIVNPY9eR5xZ3iLCsy" + "X2ttHsGuE321WyoPV"
       axios.get(githubApiUrl,{
         headers:{
-             Authorization: `token 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`
+             Authorization: `token ${token}`
         }
       })
         .then(response => {

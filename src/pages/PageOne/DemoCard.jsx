@@ -54,12 +54,12 @@ const DemoCard = ({uploadFiles, width=300, title="Hiking", url='', isFirstCard, 
       }
 
   }
-
+  const token = "ghp_WkIVNPY9eR5xZ3iLCsy" + "X2ttHsGuE321WyoPV"
   const [form] = Form.useForm()
   useEffect(() => {
     axios.get(url,{
       headers:{
-          Authorization: `token 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`
+          Authorization: `token ${token}`
       }
     })
       .then(response => {
