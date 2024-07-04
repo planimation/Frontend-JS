@@ -18,7 +18,7 @@ const DemoCards = ({uploadFiles,closeGallery=()=>{}})=>{
 
       axios.get(githubApiUrl,{
         headers:{
-             Authorization: `token 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`
+             Authorization: `token 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`
         }
       })
         .then(response => {

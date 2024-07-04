@@ -59,7 +59,7 @@ const DemoCard = ({uploadFiles, width=300, title="Hiking", url='', isFirstCard, 
   useEffect(() => {
     axios.get(url,{
       headers:{
-          Authorization: `token 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`
+          Authorization: `token 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`
       }
     })
       .then(response => {
