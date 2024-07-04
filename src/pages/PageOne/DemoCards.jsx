@@ -10,15 +10,15 @@ const DemoCards = ({uploadFiles,closeGallery=()=>{}})=>{
 
    useEffect(() => {
      // get all the subDirectory url from Github
-      const owner = 'Lin064';
-      const repo = 'PL-Profiles';
-      const path = '';
-      const branch = 'main';
-      const githubApiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
+     const owner = 'planimation';
+     const repo = 'documentation';
+     const path = 'AnimationProfiles';
+     const branch = 'master';
+     const githubApiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
 
       axios.get(githubApiUrl,{
         headers:{
-       
+             Authorization: `token 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`
         }
       })
         .then(response => {
