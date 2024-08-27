@@ -3,9 +3,9 @@ name: Publish Docker image
 on:
   release:
     types: [published]
-  # push:
-  #   branches:
-  #       - 'develop'
+  push:
+    branches:
+        - 'main'
 jobs:
   push_to_registry:
     name: Push Docker image to Docker Hub
@@ -25,7 +25,7 @@ jobs:
         run: |
           ls -la
           cd server
-          docker build . -f docker/release/Dockerfile -t nirlipo/planimation_frontend_js:latest
+          docker build . -f Dockerfile -t nirlipo/planimation_frontend_js:latest
           
       - name: push the docker image
         id: push-docker-image
