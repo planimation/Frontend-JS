@@ -38,26 +38,32 @@ export default function DropAndFetch({ onStore, onClick, newURL }) {
 
   const uploadPDDL = async (files) => {
     const formData = new FormData();
+
     for (const name in files) {
       formData.append(name, files[name]);
     }
+
 
     try {
       setLoading(true);
       const resp = await fetch(
         "https://planimation.planning.domains/upload/pddl",
+        //"http://127.0.0.1:8000/upload/pddl",
         {
-          //"http://127.0.0.1:8000/upload/pddl" On local server
+          // "http://127.0.0.1:8000/upload/pddl" On local server
           method: "POST", //DO NOT use headers
           body: formData, // Dataformat
         }
       );
       const data = await resp.json();
+      if(data.status==='error'){
+        throw new Error(data.message)
+      }
+
       const txt = JSON.stringify(data);
       onStore(txt);
     } catch (error) {
-   
-      setAlert(error);
+      setAlert(error.message);
     } finally {
       setLoading(false);
     }
@@ -69,17 +75,18 @@ export default function DropAndFetch({ onStore, onClick, newURL }) {
 
   const handleSubmit = () => {
     //Control check for files
-    if (newURL.lenght > 1) {
+    if (newURL.length > 1) {
       handleFileLoad("url", newURL);
     }
+
     if (
       "domain" in dataFiles &&
       "problem" in dataFiles &&
-      "animation" in dataFiles
+      "animation" in dataFiles &&
+      "url" in dataFiles
     ) {
       uploadPDDL(dataFiles);
     } else {
-      
       setAlert("Some files are missing");
     }
   };
@@ -131,7 +138,7 @@ export default function DropAndFetch({ onStore, onClick, newURL }) {
         <Alert
           open={showAlert.length > 1 ? true : false}
           reset={handleResetAlert}
-          severity="warning"
+          severity="error"
         >
           {showAlert}
         </Alert>

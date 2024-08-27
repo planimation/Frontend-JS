@@ -61,7 +61,6 @@ export default function Screen({ canvasWidth, canvasHeight, sprites, vfg }) {
           const spriteHeight = (sprite.maxY - sprite.minY) * canvasHeight;
           const centerY = y + spriteHeight / 2;
 
-
           // Draw the sprite with a text
           return (
             <React.Fragment key={i}>
@@ -274,6 +273,7 @@ export function GoalScreen({
                              onSubgoalStepItemClick,
                              visualStage
                            }) {
+
 
   return (
     <React.Fragment>
