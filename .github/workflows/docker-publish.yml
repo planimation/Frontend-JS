@@ -24,7 +24,6 @@ jobs:
         id: build-docker-image
         run: |
           ls -la
-          cd server
           docker build . -f Dockerfile -t nirlipo/planimation_frontend_js:latest
           
       - name: push the docker image
