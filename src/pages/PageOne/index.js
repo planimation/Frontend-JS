@@ -8,6 +8,9 @@ import css from '../../Styles/index.module.less';
 import {InputLabel} from "@material-ui/core";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import {FloatButton, Modal, Tour} from "antd";
+import {UploadOutlined} from "@ant-design/icons";
+import DemoCards from "./DemoCards.jsx";
 
 const options = [
   {
@@ -38,28 +41,39 @@ const options = [
 class PageOne extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {url:'https://solver.planning.domains:5001/package/dual-bfws-ffparser/solve',
+    this.state = {
+      url:'https://solver.planning.domains:5001/package/dual-bfws-ffparser/solve',
       fineUrl:'',
       alertURL:false,
+      loaderModelOpen:false,
+      externalFiles:{},
+      tourOpen:localStorage.getItem("used") !== "yes",
       alertMessage: ''};
+    this.floatBtnRef = React.createRef();
+
     this.handleOnClick = this.handleOnClick.bind(this);
     this.handleSendURL = this.handleSendURL.bind(this);
-  }
+    this.handleSetExternalFiles = this.handleSetExternalFiles.bind(this);
 
+  }
+  handleSetExternalFiles = (files)=>{
+    this.setState({externalFiles:files})
+  }
   handleOnClick = () => {
     this.props.history.push('/')
   }
 
+
   handleStore = (content)=> {
     localStorage.setItem('fileContent', content);
+
     window.location.href = '/demo';
   }
 
   handleNewURL = (urlString) => {
-    const url = {...this.state};
-    url['url'] = urlString;
-    this.setState(url);
+    this.setState({url:urlString});
   }
+
 
   handleSendURL = () => {
     const state = {...this.state};
@@ -88,6 +102,19 @@ class PageOne extends React.Component {
   }
 
   render() {
+    const steps = [
+      {
+        title: 'Quick Samples',
+        description: 'Load a sample from github',
+        cover: (
+          <img
+            alt="tour.png"
+            src="https://achieva-agent-public.oss-ap-southeast-1.aliyuncs.com/cover.png"
+          />
+        ),
+        target: () => this.floatBtnRef.current,
+      },
+    ];
     const useStyles = makeStyles((theme) => ({
       root: {
         '& > *': {
@@ -125,21 +152,62 @@ class PageOne extends React.Component {
               }
             </Select>
           </div>
-          <div style={{float: 'left', marginLeft: '1%', alignItems: 'center'}}>
-            <Button onClick={this.handleSendURL} variant="contained" color="primary" size="medium">
-              Paste
-            </Button>
-          </div>
+
         </form>
+
         <div>
-          <h3 className={css.text}>
+          <h3 className={css.text} >
             Step 2 - Upload Problem, Domain and Animation Profile Files
           </h3>
         </div>
-        <DropAndFetch onClick={this.handleOnClick} onStore={this.handleStore} newURL={this.state.url}/>
+
+        <DropAndFetch
+          onClick={this.handleOnClick}
+          onStore={this.handleStore}
+          newURL={this.state.url}
+          externalFiles = {this.state.externalFiles}
+        />
         <Alert open={this.state.alertURL} reset={this.handleResetAlert} severity="warning">
           {this.state.alertMessage}
         </Alert>
+
+        <Modal
+          title="Animation Gallery"
+
+          open={this.state.loaderModelOpen}
+          width={'70vw'}
+          styles={{
+            body: { height:'60vh' ,overflow:'auto'}
+          }}
+          onOk={()=>{
+            this.setState({ loaderModelOpen: false})
+          }}
+          onCancel={()=>{
+            this.setState({ loaderModelOpen: false})
+          }}
+        >
+
+          <DemoCards uploadFiles={this.handleSetExternalFiles}
+                     closeGallery={()=>{   this.setState({ loaderModelOpen: false})}}
+          />
+
+        </Modal>
+
+        <FloatButton
+          tooltip={'Load Quick Demo'}
+          type="primary"
+          ref={this.floatBtnRef}
+          style={{
+            right: 50,
+          }}
+          icon={<UploadOutlined/>}
+          onClick={()=>{
+            this.setState({ loaderModelOpen: true})
+          }} />
+        <Tour open={this.state.tourOpen} onClose={() => {
+          localStorage.setItem("used","yes");
+          this.setState({tourOpen: false})
+        }} steps={steps} />
       </div>
     );
   }
