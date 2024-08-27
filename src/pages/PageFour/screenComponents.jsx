@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { Stage, Text, Sprite } from "@inlet/react-pixi";
 import { utils } from "pixi.js";
 import IconButton from "@material-ui/core/IconButton";
@@ -30,6 +30,7 @@ function valuetext(value) {
  * @returns Main visualisation screen with all sprites
  */
 export default function Screen({ canvasWidth, canvasHeight, sprites, vfg }) {
+
   return (
     <React.Fragment>
       <Stage
@@ -59,6 +60,7 @@ export default function Screen({ canvasWidth, canvasHeight, sprites, vfg }) {
           const spriteWidth = (sprite.maxX - sprite.minX) * canvasHeight;
           const spriteHeight = (sprite.maxY - sprite.minY) * canvasHeight;
           const centerY = y + spriteHeight / 2;
+
           // Draw the sprite with a text
           return (
             <React.Fragment key={i}>
@@ -269,10 +271,13 @@ export function GoalScreen({
                              showKey,
                              onSubItemClick,
                              onSubgoalStepItemClick,
+                             visualStage
                            }) {
+
+
   return (
     <React.Fragment>
-      <div className={styles.sub_title} style={{ position: "relative" }}>
+      <div className={styles.sub_title} style={{position: "relative"}}>
         <span className={styles.sub_title_key}>Subgoal</span>
         <span className={styles.sub_title_selected}>
           {Object.keys(selectedSubGoals || {}).length}/{subGoal.size}
@@ -296,7 +301,7 @@ export function GoalScreen({
                 {key}
                 <div
                   className={styles.sub_item_menu}
-                  style={{ display: showKey === key ? "block" : "none" }}
+                  style={{display: showKey === key ? "block" : "none"}}
                 >
                   {subGoal.get(key).map((value) => {
                     return (
@@ -314,6 +319,19 @@ export function GoalScreen({
             );
           })}
       </div>
+      <div className={styles.sub_title}>Action Cost</div>
+      {visualStage["cost"] ? (
+        <div key={visualStage["cost"]}
+             className={`${styles.action_cost} ${styles.action_cost_animation}`}>
+          {
+            Number(visualStage["cost"].toFixed(3)).toString()
+          }
+        </div>
+      ) : (
+        <div className={styles.action_cost}>No Cost</div>
+      )}
+
+
     </React.Fragment>
   );
 }
