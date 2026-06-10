@@ -450,6 +450,15 @@ module.exports = function (webpackEnv) {
                     { helpers: true },
                   ],
                 ],
+                plugins: [
+                  // Required for antd v5+ deps (e.g. @rc-component/async-validator)
+                  // which ship ES modules with class static fields that
+                  // babel-preset-react-app/dependencies does not transform.
+                  [
+                    require.resolve('@babel/plugin-proposal-class-properties'),
+                    { loose: true },
+                  ],
+                ],
                 cacheDirectory: true,
                 // See #6846 for context on why cacheCompression is disabled
                 cacheCompression: false,
