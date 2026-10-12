@@ -29,7 +29,9 @@ const DemoCard = ({uploadFiles, width=300, title="Hiking", entries=[], isFirstCa
 
   const matchers = {DOMAIN: isDomainFile, PROBLEM: isProblemFile, AP: isAnimationFile};
   const filteredFiles = (keyword)=>{
+    // natural order, so prob_2plus2 comes before prob_10plus10 and is the default
     return files.filter(item=>matchers[keyword](item.name))
+      .sort((a,b)=>a.name.localeCompare(b.name, undefined, {numeric: true}))
       .map(item=>{
         return {label:item.name, value:item.name}
       })
