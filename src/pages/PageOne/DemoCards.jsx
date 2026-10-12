@@ -2,6 +2,7 @@ import {useEffect, useState} from "react";
 import axios from "axios";
 import {Empty, Flex} from "antd";
 import DemoCard from "./DemoCard";
+import {isLoadable} from "./demoFiles";
 
 
 
@@ -37,7 +38,10 @@ const DemoCards = ({uploadFiles,closeGallery=()=>{}})=>{
                  })
               }
            })
-           setCardsInfo(Object.keys(folders).map(name=>({name: name, files: folders[name]})))
+           // hide folders that do not hold a complete domain/problem/animation set
+           setCardsInfo(Object.keys(folders)
+              .filter(name=>isLoadable(folders[name].map(file=>file.name)))
+              .map(name=>({name: name, files: folders[name]})))
         })
 
    }, []);
