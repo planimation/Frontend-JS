@@ -4,6 +4,7 @@ import Meta from "antd/es/card/Meta";
 import {Card, Typography, Image, Modal, Form,Select,Tour,message} from "antd";
 import {CloudUploadOutlined} from "@ant-design/icons";
 import axios from "axios";
+import {isAnimationFile, isDomainFile, isProblemFile, pickCover} from "./demoFiles";
 
 
 const DemoCard = ({uploadFiles, width=300, title="Hiking", entries=[], isFirstCard, closeGallery=()=>{}})=>{
@@ -26,8 +27,9 @@ const DemoCard = ({uploadFiles, width=300, title="Hiking", entries=[], isFirstCa
 
 
 
+  const matchers = {DOMAIN: isDomainFile, PROBLEM: isProblemFile, AP: isAnimationFile};
   const filteredFiles = (keyword)=>{
-    return files.filter(item=>item.name.toUpperCase().includes(keyword))
+    return files.filter(item=>matchers[keyword](item.name))
       .map(item=>{
         return {label:item.name, value:item.name}
       })
@@ -59,10 +61,15 @@ const DemoCard = ({uploadFiles, width=300, title="Hiking", entries=[], isFirstCa
     Promise.resolve(entries)
       .then(files => {
         // load files from their raw Github URLs
+        const pngs = files.filter(file => file.name.toUpperCase().endsWith(".PNG"));
+        const cover = pickCover(title, pngs.map(file => file.name));
+        if(cover){
+            setCoverSrc(pngs.find(file => file.name === cover).download_url)
+        }
         const filePromises = files.map((file,index) => {
           if (file.type === 'file') {
-            if(file.name.toUpperCase().includes(".PNG")){
-                setCoverSrc(file.download_url)
+            if(file.name.toUpperCase().endsWith(".PNG")){
+                return null
             }else{
               return axios.get(file.download_url, { responseType: 'blob',
               })
