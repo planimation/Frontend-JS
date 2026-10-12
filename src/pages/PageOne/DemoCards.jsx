@@ -9,29 +9,35 @@ const DemoCards = ({uploadFiles,closeGallery=()=>{}})=>{
    const [cardsInfo,setCardsInfo] = useState();
 
    useEffect(() => {
-     // get all the subDirectory url from Github
+     // get the whole repository tree from Github in a single unauthenticated request
+     // (the repository is public; never put a token in front-end code, it ships in the bundle)
      const owner = 'planimation';
      const repo = 'documentation';
      const path = 'AnimationProfiles';
      const branch = 'master';
-     const githubApiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
-     const token = "ghp_WkIVNPY9eR5xZ3iLCsy" + "X2ttHsGuE321WyoPV"
-      axios.get(githubApiUrl,{
-        headers:{
-             Authorization: `token ${token}`
-        }
-      })
+     const githubApiUrl = `https://api.github.com/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`;
+     const rawUrl = (filePath) => `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/`
+        + filePath.split('/').map(encodeURIComponent).join('/');
+      axios.get(githubApiUrl)
         .then(response => {
-           const files = response.data;
-           let folders = files.map(item=>{
-              if(item.type=='dir'){
-                 return {
-                    name: item.name,
-                    url: item.url
-                 }
+           // group the files directly inside each AnimationProfiles/<folder>
+           const folders = {};
+           response.data.tree.forEach(item=>{
+              const parts = item.path.split('/');
+              if(parts[0] !== path) return;
+              if(item.type === 'tree' && parts.length === 2){
+                 folders[parts[1]] = folders[parts[1]] || [];
+              }else if(item.type === 'blob' && parts.length === 3){
+                 folders[parts[1]] = folders[parts[1]] || [];
+                 folders[parts[1]].push({
+                    type: 'file',
+                    name: parts[2],
+                    download_url: rawUrl(item.path),
+                    url: rawUrl(item.path)
+                 })
               }
            })
-           setCardsInfo(folders.filter(item=>item))
+           setCardsInfo(Object.keys(folders).map(name=>({name: name, files: folders[name]})))
         })
 
    }, []);
@@ -44,7 +50,7 @@ const DemoCards = ({uploadFiles,closeGallery=()=>{}})=>{
           :<Flex justify={'center'} wrap={"wrap"} align={'center'} gap={40}>
                 {
                    cardsInfo.map((item,index)=>{
-                      return <DemoCard title={item.name} url={item.url} isFirstCard={index === 0}
+                      return <DemoCard title={item.name} entries={item.files}isFirstCard={index === 0}
                                        closeGallery={closeGallery}
                                        uploadFiles={uploadFiles}/>
                    })
