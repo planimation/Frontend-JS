@@ -6,7 +6,7 @@ import {CloudUploadOutlined} from "@ant-design/icons";
 import axios from "axios";
 
 
-const DemoCard = ({uploadFiles, width=300, title="Hiking", url='', isFirstCard, closeGallery=()=>{}})=>{
+const DemoCard = ({uploadFiles, width=300, title="Hiking", entries=[], isFirstCard, closeGallery=()=>{}})=>{
 
   // the description row size
   const [rows, setRows] = useState(2);
@@ -54,17 +54,11 @@ const DemoCard = ({uploadFiles, width=300, title="Hiking", url='', isFirstCard, 
       }
 
   }
-  const token = "ghp_WkIVNPY9eR5xZ3iLCsy" + "X2ttHsGuE321WyoPV"
   const [form] = Form.useForm()
   useEffect(() => {
-    axios.get(url,{
-      headers:{
-          Authorization: `token ${token}`
-      }
-    })
-      .then(response => {
-        // load files from Github URL
-        const files = response.data;
+    Promise.resolve(entries)
+      .then(files => {
+        // load files from their raw Github URLs
         const filePromises = files.map((file,index) => {
           if (file.type === 'file') {
             if(file.name.toUpperCase().includes(".PNG")){
